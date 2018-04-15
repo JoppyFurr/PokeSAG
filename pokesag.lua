@@ -1,13 +1,67 @@
 #!/usr/bin/luajit
-local radio = require ('radio')
+
+----------------
+--  Database  --
+----------------
+local sqlite3 = require ('lsqlite3')
+
+
+-- Note: Each radio block runs in its own process, so we can't share a single
+--       database connection. For now, re-open/close the database for each new
+--       page. To improve this perhaps have each instance of the DBSink block
+--       store its own database connection.
+--       Note: This will mean we need a destructor for the DBSink block.
+
+-- Create the table if it doesn't already exist
+function create_database ()
+    local db = sqlite3.open('pages.sqlite3', sqlite3.OPEN_CREATE + sqlite3.OPEN_READWRITE)
+
+    db:exec [[
+        create table pages (
+            rx_date     date    not null,
+            source      string  not null,
+            recipient   string  not null,
+            content     string  not null);
+    ]]
+
+    db:close ()
+end
+
+-- Use a prepared statement to store a page in the database
+function store_page (date, source, address, content)
+    local db = sqlite3.open('pages.sqlite3', sqlite3.OPEN_CREATE + sqlite3.OPEN_READWRITE + sqlite3.OPEN_FULLMUTEX)
+
+    local statement = db:prepare [[
+        insert into pages (
+            rx_date,
+            source,
+            recipient,
+            content)
+        values (
+            :p_date,
+            :p_source,
+            :p_recipient,
+            :p_content);
+    ]]
+    statement:bind_names ( { p_date = date,
+                             p_source = source,
+                             p_recipient = address,
+                             p_content = content } )
+    statement:step ()
+    statement:finalize ()
+    db:close ()
+end
+
 
 ------------
 --  Sink  --
 ------------
+local radio = require ('radio')
 local DBSink = radio.block.factory ('DBSink')
+
 function DBSink:instantiate (name)
     -- Type signature
-    self:add_type_signature ( { radio.block.Input ("in", function (type) return type.to_json ~= nil end) }, {} )
+    self:add_type_signature ( { radio.block.Input ('in', function (type) return type.to_json ~= nil end) }, {} )
 
     self.name = name
 end
@@ -15,11 +69,15 @@ end
 function DBSink:process (x)
     for i = 0, x.length-1 do
         if x.data[i].alphanumeric ~= nil then
-            local str = x.data[i].alphanumeric:gsub ('%c','')
-            print (os.date ("[%F %T] ") .. self.name .. ': ' .. str)
+            -- TODO: Support for numeric content
+            local content = x.data[i].alphanumeric:gsub ('%c','')
+            local date = os.date ('%F %T')
+            print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
+            store_page (date, self.name, x.data[i].address, content)
         end
     end
 end
+
 
 ----------------
 --  Receiver  --
@@ -47,5 +105,5 @@ local hospital_decoder   = radio.POCSAGReceiver (1200)
 local hospital_sink      = DBSink ('Hospital')
 PokeSAG:connect (source, hospital_tuner, hospital_decoder, hospital_sink)
 
-
+create_database ()
 PokeSAG:run ()
