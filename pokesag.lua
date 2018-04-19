@@ -43,12 +43,18 @@ function store_page (date, source, address, content)
             :p_recipient,
             :p_content);
     ]]
-    statement:bind_names ( { p_date = date,
-                             p_source = source,
-                             p_recipient = address,
-                             p_content = content } )
-    statement:step ()
-    statement:finalize ()
+
+    if statement ~= nil then
+        statement:bind_names ( { p_date = date,
+                                 p_source = source,
+                                 p_recipient = address,
+                                 p_content = content } )
+        statement:step ()
+        statement:finalize ()
+    else
+        print ('Error: Failed to create prepared statement')
+    end
+
     db:close ()
 end
 
