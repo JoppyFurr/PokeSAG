@@ -73,13 +73,22 @@ function DBSink:instantiate (name)
 end
 
 function DBSink:process (x)
+    local date = os.date ('%F %T')
+
     for i = 0, x.length-1 do
+
+        -- First, check for an alphanumeric page
         if x.data[i].alphanumeric ~= nil then
-            -- TODO: Support for numeric content
             local content = x.data[i].alphanumeric:gsub ('%c','')
-            local date = os.date ('%F %T')
             print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
             store_page (date, self.name, x.data[i].address, content)
+
+        -- Failing that, fall back to a numeric page
+        elseif x.data[i].numeric ~= nil then
+            local content = x.data[i].numeric:gsub ('%c','')
+            print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
+            store_page (date, self.name, x.data[i].address, content)
+
         end
     end
 end
