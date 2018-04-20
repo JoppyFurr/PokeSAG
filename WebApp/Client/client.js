@@ -32,8 +32,25 @@ class PokeSAG_Client extends React.Component
     render ()
     {
         let pages = this.state.pages_database.map ( page => {
-            return <p>{page.content}</p>
+            return <tr>
+                    <td className="page_rx_date">{page.rx_date}</td>
+                    <td className="page_source">{page.source}</td>
+                    <td className="page_recipient">{page.recipient}</td>
+                    <td className="page_content">{page.content}</td>
+                </tr>
         });
-        return <div className="page_list">{pages}</div>
+        return <div className="page_table">
+                <table>
+                    <thead>
+                        <th scope="col">Received</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Recipient</th>
+                        <th scope="col">Message</th>
+                    </thead>
+                    <tbody>
+                        {pages}
+                    </tbody>
+                </table>
+            </div>
     }
 }
