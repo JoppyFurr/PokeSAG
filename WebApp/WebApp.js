@@ -28,7 +28,7 @@ app.use (express.static ('Client', { 'index': ['main.html'] } ));
 /* API to retrieve pages */
 /* TODO: Come up with something faster, like sending 100 pages at a time */
 app.get ('/Pages/', function onListenEvent (req, res) {
-    db.all ('select * from pages order by rx_date', [], (error, rows) => {
+    db.all ('select * from pages order by rx_date desc limit 100', [], (error, rows) => {
         if (error) {
             throw error;
         }
