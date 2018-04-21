@@ -18,7 +18,7 @@ table {
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 32px;
-    width: 85%;
+    width: 100%;
 }
 
 tr, th, td {
@@ -33,7 +33,50 @@ tbody tr:nth-child(even) {
     background-color: #585858;
 }
 
+.app_container {
+    margin-left: auto;
+    margin-right: auto;
+    width: 85%;
+}
+
 .page_content {
     text-align: left;
     padding-left: 8px;
+}
+
+.toolbar {
+    background-color: #404040;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    width: 100%;
+    text-align: left;
+}
+
+.hamburger_button {
+    margin-left: 8px;
+    padding-right: 24px;
+    border-left: none;
+}
+
+.refresh_button {
+    float: right;
+    padding-left: 24px;
+    margin-right: 8px;
+    border-left: 2px solid #606060;
+    border-right: none;
+}
+
+.search_box {
+    border-right: 2px solid #606060;
+}
+
+input {
+    color: white;
+    background-color: #404040;
+    border-top: none;
+    border-bottom: none;
+    border-left: 1px solid #606060;
+    border-right: 1px solid #606060;
+    padding: 16px;
 }

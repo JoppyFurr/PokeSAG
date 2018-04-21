@@ -39,18 +39,25 @@ class PokeSAG_Client extends React.Component
                     <td className="page_content">{page.content}</td>
                 </tr>
         });
-        return <div className="page_table">
-                <table>
-                    <thead>
-                        <th scope="col">Received</th>
-                        <th scope="col">Source</th>
-                        <th scope="col">Recipient</th>
-                        <th scope="col">Message</th>
-                    </thead>
-                    <tbody>
-                        {pages}
-                    </tbody>
-                </table>
+        return <div className="app_container">
+                <div className="toolbar">
+                    <input className="hamburger_button" type="button" value="☰" />
+                    <input className="search_box" type="text" placeholder="Search…" />
+                    <input className="refresh_button" type="button" value="↻" />
+                </div>
+                <div className="page_table">
+                    <table>
+                        <thead>
+                            <th scope="col">Received</th>
+                            <th scope="col">Source</th>
+                            <th scope="col">Recipient</th>
+                            <th scope="col">Message</th>
+                        </thead>
+                        <tbody>
+                            {pages}
+                        </tbody>
+                    </table>
+                </div>
             </div>
     }
 }
