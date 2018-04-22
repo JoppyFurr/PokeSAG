@@ -59,6 +59,10 @@ tbody tr:nth-child(even) {
     border-left: none;
 }
 
+.search_box {
+    border-right: 2px solid #606060;
+}
+
 .refresh_button {
     float: right;
     padding-left: 24px;
@@ -67,16 +71,26 @@ tbody tr:nth-child(even) {
     border-right: none;
 }
 
-.search_box {
-    border-right: 2px solid #606060;
+.refresh_button:hover {
+    color: #ffc080;
+}
+
+.refresh_button:active {
+    color: #e0a060;
 }
 
 input {
-    color: white;
+    color: #c0c0c0;
     background-color: #404040;
     border-top: none;
     border-bottom: none;
     border-left: 1px solid #606060;
     border-right: 1px solid #606060;
     padding: 16px;
+}
+
+/* TODO: The outline looked bad. What can we use
+ *       instead for tabbing through the interface? */
+input:focus {
+    outline: none !important;
 }

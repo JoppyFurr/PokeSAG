@@ -43,7 +43,7 @@ class PokeSAG_Client extends React.Component
                 <div className="toolbar">
                     <input className="hamburger_button" type="button" value="☰" />
                     <input className="search_box" type="text" placeholder="Search…" />
-                    <input className="refresh_button" type="button" value="↻" />
+                    <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} />
                 </div>
                 <div className="page_table">
                     <table>
