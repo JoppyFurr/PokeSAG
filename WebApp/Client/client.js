@@ -7,10 +7,35 @@ class PokeSAG_Client extends React.Component
         super ();
 
         this.state = {
-            pages_database: []
+            pages_database: [],
+            search_string: ""
         };
 
         this.refresh_data = this.refresh_data.bind (this);
+        this.update_search_string = this.update_search_string.bind (this);
+        this.perform_search = this.perform_search.bind (this);
+    }
+
+
+    update_search_string (e)
+    {
+        /* Remove characters that don't “just work” */
+        let filtered_string = e.target.value.replace (/[#%.?\/\\]/g, '');
+        this.setState ( { search_string: filtered_string } );
+    }
+
+    perform_search (e)
+    {
+        if (e.key === 'Enter' && this.state.search_string != '')
+        {
+            fetch ('/Pages/Search/' + this.state.search_string + '/')
+                .then ( result => {
+                    result.json()
+                        .then ( json => {
+                            this.setState ( { pages_database: json } );
+                        });
+                });
+        }
     }
 
     refresh_data (e)
@@ -42,7 +67,7 @@ class PokeSAG_Client extends React.Component
         return <div className="app_container">
                 <div className="toolbar">
                     <input className="hamburger_button" type="button" value="☰" />
-                    <input className="search_box" type="text" placeholder="Search…" />
+                    <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string} onChange={this.update_search_string} onKeyPress={this.perform_search} />
                     <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} />
                 </div>
                 <div className="page_table">

@@ -25,10 +25,21 @@ let port = process.env.PORT || 8080;
 
 app.use (express.static ('Client', { 'index': ['main.html'] } ));
 
-/* API to retrieve pages */
-/* TODO: Come up with something faster, like sending 100 pages at a time */
+/* API to retrieve the 100 most recent pages */
 app.get ('/Pages/', function onListenEvent (req, res) {
-    db.all ('select * from pages order by rx_date desc limit 100', [], (error, rows) => {
+    let statement = db.prepare ('select * from pages order by rx_date desc limit 100');
+    statement.all ([], (error, rows) => {
+        if (error) {
+            throw error;
+        }
+        res.send (rows);
+    });
+});
+
+/* API to retrieve all pages matching a string */
+app.get ('/Pages/Search/:string/', function onListenEvent (req, res) {
+    let statement = db.prepare ("select * from pages where content like (?) order by rx_date desc");
+    statement.all (['%' + req.params.string + '%'], (error, rows) => {
         if (error) {
             throw error;
         }
