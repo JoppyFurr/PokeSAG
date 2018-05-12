@@ -116,7 +116,7 @@ PokeSAG:connect (source, telecom950_tuner, telecom950_decoder, telecom950_sink)
 
 -- Hospital: 157.975 MHz
 local hospital_tuner     = radio.TunerBlock (-75000, 12e3, 80)
-local hospital_decoder   = radio.POCSAGReceiver (1200)
+local hospital_decoder   = radio.POCSAGReceiver (512)
 local hospital_sink      = DBSink ('Hospital')
 PokeSAG:connect (source, hospital_tuner, hospital_decoder, hospital_sink)
 
