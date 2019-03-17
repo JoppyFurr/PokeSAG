@@ -1,0 +1,14 @@
+[Unit]
+Description="Pokesag-sdr"
+After="network.target"
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Code/PokeSAG
+ExecStart=/home/pi/Code/PokeSAG/run.sh
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target
