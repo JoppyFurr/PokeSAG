@@ -2,18 +2,35 @@
  * Joppy Furr, 2018
  */
 const express = require ('express');
-const sqlite3 = require ('sqlite3').verbose ();
+const postgres = require ('pg').Client;
+
+/*********************
+ * Utility functions *
+ *********************/
+
+function clean_rows (rows)
+{
+    for (i = 0; i < rows.length; i++)
+    {
+        /* Remove the T, and chop off the milliseconds. */
+        rows[i].rx_date = rows[i].rx_date.toISOString ().slice (0,19).replace ('T', ' ');
+    }
+}
+
 
 /***********************
  * Database Connection *
  ***********************/
 
-let db = new sqlite3.Database('../pages.sqlite3', sqlite3.OPEN_READONLY, (error) => {
-    if (error) {
-        return console.error (error.message);
-    }
-    console.log ('PokéSAG WebApp connected to database file pages.sqlite3');
-});
+let db = new postgres (
+    {
+        user: 'username',
+        password: 'password',
+        host: 'localhost',
+        database: 'pokesag',
+        port: 'port',
+    } );
+db.connect ();
 
 
 /***************
@@ -27,23 +44,22 @@ app.use (express.static ('Client', { 'index': ['main.html'] } ));
 
 /* API to retrieve the 100 most recent pages */
 app.get ('/Pages/', function onListenEvent (req, res) {
-    let statement = db.prepare ('select * from pages order by rx_date desc limit 100');
-    statement.all ([], (error, rows) => {
-        if (error) {
-            throw error;
+    db.query ('select * from pages order by rx_date desc limit 100', (query_err, query_res) => {
+        if (query_err) {
+            throw query_err;
         }
-        res.send (rows);
+        clean_rows (query_res.rows);
+        res.send (query_res.rows);
     });
 });
 
 /* API to retrieve all pages matching a string */
 app.get ('/Pages/Search/:string/', function onListenEvent (req, res) {
-    let statement = db.prepare ("select * from pages where content like (?) order by rx_date desc");
-    statement.all (['%' + req.params.string + '%'], (error, rows) => {
-        if (error) {
-            throw error;
+    db.query ("select * from pages where content like $1 order by rx_date desc", ['%' + req.params.string + '%'], (query_err, query_res) => {
+        if (query_err) {
+            throw query_err;
         }
-        res.send (rows);
+        res.send (query_res.rows);
     });
 });
 
