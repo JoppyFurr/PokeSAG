@@ -9,6 +9,7 @@
   "author": "Joppy Furr",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "sqlite3": "^4.0.0"
+    "sqlite3": "^4.0.0",
+    "pg": "^7.9.0"
   }
 }
