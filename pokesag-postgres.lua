@@ -1,9 +1,16 @@
 #!/usr/bin/luajit
 
+------------------
+--  Environment --
+------------------
+local username = os.getenv("DB_USER")
+local password = os.getenv("DB_PASS")
+local path = os.getenv("DB_PATH")
+
 ----------------
 --  Database  --
 ----------------
-local sqlite3 = require ('lsqlite3')
+local postgres = require ('pgsql')
 
 
 -- Note: Each radio block runs in its own process, so we can't share a single
@@ -14,48 +21,63 @@ local sqlite3 = require ('lsqlite3')
 
 -- Create the table if it doesn't already exist
 function create_database ()
-    local db = sqlite3.open('pages.sqlite3', sqlite3.OPEN_CREATE + sqlite3.OPEN_READWRITE)
+    local db = postgres.connectdb (
+        'postgresql://' .. username .. ':' .. password .. '@' .. path)
 
-    db:exec [[
+    if db:status() == postgres.CONNECTION_OK then
+        print ('Connected to database.')
+    else
+        print ('Error connecting to database.')
+        print (db:errorMessage())
+        return false
+    end
+
+    local rc = db:exec [[
         create table pages (
-            rx_date     date    not null,
-            source      string  not null,
-            recipient   string  not null,
-            content     string  not null);
+            rx_date     timestamp   not null,
+            source      text        not null,
+            recipient   text        not null,
+            content     text        not null);
     ]]
 
-    db:close ()
+    if rc:status() == postgres.PGRES_COMMAND_OK then
+        print ('Table created.')
+    elseif string.match(rc:errorMessage (), 'already exists') then
+        print ('Table detected.')
+    else
+        print ('Error creating table.')
+        print (rc:errorMessage ())
+        return false
+    end
+
+    db:finish ()
+    return true
 end
 
 -- Use a prepared statement to store a page in the database
 function store_page (date, source, address, content)
-    local db = sqlite3.open('pages.sqlite3', sqlite3.OPEN_CREATE + sqlite3.OPEN_READWRITE + sqlite3.OPEN_FULLMUTEX)
+    local db = postgres.connectdb('postgresql://pokesag-sdr:pokesag-sdr@web.joppyfurr.lc:5432/pokesag')
 
-    local statement = db:prepare [[
-        insert into pages (
-            rx_date,
-            source,
-            recipient,
-            content)
-        values (
-            :p_date,
-            :p_source,
-            :p_recipient,
-            :p_content);
-    ]]
-
-    if statement ~= nil then
-        statement:bind_names ( { p_date = date,
-                                 p_source = source,
-                                 p_recipient = address,
-                                 p_content = content } )
-        statement:step ()
-        statement:finalize ()
-    else
-        print ('Error: Failed to create prepared statement')
+    local rc = db:prepare ('add-page',
+        [[
+            insert into pages (
+                rx_date,
+                source,
+                recipient,
+                content)
+            values ($1, $2, $3, $4);
+        ]]
+    )
+    if rc:status() ~= postgres.PGRES_COMMAND_OK then
+        print ("Create prepared statement: " .. rc:errorMessage ())
     end
 
-    db:close ()
+    rc = db:execPrepared ('add-page', date, source, address, content)
+    if rc:status() ~= postgres.PGRES_COMMAND_OK then
+        print ("Exec prepared statement: " .. rc:errorMessage ())
+    end
+
+    db:finish ()
 end
 
 
@@ -72,6 +94,19 @@ function DBSink:instantiate (name)
     self.name = name
 end
 
+function clean_string (s_dirty)
+    local s_clean = ''
+
+    for i = 1, #s_dirty do
+        local c = s_dirty:sub (i, i)
+        if c:byte () >= 32 and c:byte () < 127 then
+            s_clean = s_clean .. c
+        end
+    end
+
+    return s_clean
+end
+
 function DBSink:process (x)
     local date = os.date ('%F %T')
 
@@ -79,15 +114,15 @@ function DBSink:process (x)
 
         -- First, check for an alphanumeric page
         if x.data[i].alphanumeric ~= nil then
-            local content = x.data[i].alphanumeric:gsub ('%c','')
-            print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
-            store_page (date, self.name, x.data[i].address, content)
+            local content = clean_string (x.data[i].alphanumeric)
+            -- print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
+            store_page (date, self.name, tostring(x.data[i].address), content)
 
         -- Failing that, fall back to a numeric page
         elseif x.data[i].numeric ~= nil then
-            local content = x.data[i].numeric:gsub ('%c','')
-            print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
-            store_page (date, self.name, x.data[i].address, content)
+            local content = clean_string (x.data[i].numeric)
+            -- print ('[' .. date .. '] ' .. self.name .. ': ' .. content)
+            store_page (date, self.name, tostring(x.data[i].address), content)
 
         end
     end
@@ -120,5 +155,9 @@ local hospital_decoder   = radio.POCSAGReceiver (512)
 local hospital_sink      = DBSink ('Ambulance')
 PokeSAG:connect (source, hospital_tuner, hospital_decoder, hospital_sink)
 
-create_database ()
-PokeSAG:run ()
+if create_database () then
+    print ('Starting PokeSAG.')
+    PokeSAG:run ()
+else
+    print ('Unable to access database.')
+end
