@@ -59,6 +59,7 @@ app.get ('/Pages/Search/:string/', function onListenEvent (req, res) {
         if (query_err) {
             throw query_err;
         }
+        clean_rows (query_res.rows);
         res.send (query_res.rows);
     });
 });
