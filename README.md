@@ -3,15 +3,17 @@ __Warning: Depending on your region, it may not be legal to share or act upon an
 __You are advised to check your local regulations, and to NOT expose this web-app to the Internet__
 
 # PokéSAG
-A web interface for viewing SDR-captured POCSAG pages
+An interface for receiving and viewing POCSAG pages
+
+The receiver has been tested with an RTL-SDRv3 on a Raspberry Pi 2. CPU utilisation is around 80%.
 
 ## Dependencies
 * LuaRadio
   * Dependencies of LuaRadio (fftw3, libvolk, libliquid)
 * LuaJIT
-* sqlite3
-* lsqlite3 for Lua (`luarocks install lsqlite3 --local`)
-* sqlite3 for Node (`npm install` in the WebApp directory)
+* SQLite3
+* SQLite3 for Lua (`luarocks install lsqlite3 --local`)
+* SQLite3 for Node (`npm install` in the WebApp directory)
 
 ### For Postgres
 * libpg-dev
@@ -21,12 +23,11 @@ A web interface for viewing SDR-captured POCSAG pages
 
 ## Configuration
 * The port for the web app can be supplied as the environment variable PORT. (defaults to 8080)
-* Edit `run.sh` to choose between 'pokesag.lua' (SQLite3 single-file database) and 'pokesag-postgres.lua' (Postgres database)
 * Frequency and device configuration is done by manually editing the source file `pokesag.lua` / `pokesag-postgres.lua`.
   * This has been pre-populated with some frequencies used in New Zealand.
 
 ## Running
-* Launch the receiver with the `./run.sh` script. This will receive pages and store them in a database.
+* Launch the receiver with the `./run.sh` or `./run-postgres.sh` script. This will receive pages and store them in a database.
 
 * Launch the WebApp with NodeJS: `nodejs WebApp.js`. This will show the latest 100 pages on localhost:8080.
   * Use `WebApp-postgres.js` if using Postgres instead of SQLite3
