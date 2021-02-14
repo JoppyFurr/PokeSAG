@@ -8,12 +8,19 @@ class PokeSAG_Client extends React.Component
 
         this.state = {
             pages_database: [],
-            search_string: ""
+            search_string: "",
+            auto_refresh: false,
+            auto_refresh_timer: null,
+            hamburger_class: "hamburger_button",
+            settings_class: "settings hidden",
+            auto_refresh_class: "setting red"
         };
 
         this.refresh_data = this.refresh_data.bind (this);
         this.update_search_string = this.update_search_string.bind (this);
         this.perform_search = this.perform_search.bind (this);
+        this.toggle_settings = this.toggle_settings.bind (this);
+        this.toggle_auto_refresh = this.toggle_auto_refresh.bind (this);
     }
 
 
@@ -54,8 +61,41 @@ class PokeSAG_Client extends React.Component
         this.refresh_data (null);
     }
 
+    /* Toggle whether the settings are visible or not */
+    toggle_settings ()
+    {
+        if (this.state.settings_class == "settings hidden")
+        {
+            this.setState({settings_class: "settings visible"});
+            this.setState({hamburger_class: "hamburger_button green"});
+        }
+        else
+        {
+            this.setState({settings_class: "settings hidden"});
+            this.setState({hamburger_class: "hamburger_button"});
+        }
+    }
+
+    toggle_auto_refresh ()
+    {
+        if (this.state.auto_refresh == false)
+        {
+            this.state.auto_refresh = true;
+            this.state.auto_refresh_timer = setInterval( () => this.refresh_data(null), 15000);
+            this.setState({auto_refresh_class: "setting green"});
+        }
+        else
+        {
+            this.state.auto_refresh = false;
+            clearInterval(this.state.auto_refresh_timer);
+            this.state.auto_refresh_timer = null;
+            this.setState({auto_refresh_class: "setting red"});
+        }
+    }
+
     render ()
     {
+        /* Get the list of messages */
         let pages = this.state.pages_database.map ( page => {
             return <tr>
                     <td className="page_rx_date">{page.rx_date}</td>
@@ -64,12 +104,21 @@ class PokeSAG_Client extends React.Component
                     <td className="page_content">{page.content}</td>
                 </tr>
         });
+
+        /* Generate page */
         return <div className="app_container">
+
                 <div className="toolbar">
-                    <input className="hamburger_button" type="button" value="☰" />
+                    <input className={this.state.hamburger_class} type="button" value="☰" onClick={this.toggle_settings} />
                     <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string} onChange={this.update_search_string} onKeyPress={this.perform_search} />
                     <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} />
                 </div>
+
+                <div className={this.state.settings_class}>
+                    <h3> Settings </h3>
+                    <input className={this.state.auto_refresh_class} type="button" value="Auto Refresh" onClick={this.toggle_auto_refresh}  />
+                </div>
+
                 <div className="page_table">
                     <table>
                         <thead>

@@ -54,9 +54,19 @@ tbody tr:nth-child(even) {
 }
 
 .hamburger_button {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
     margin-left: 8px;
     padding-right: 24px;
     border-left: none;
+}
+
+.green {
+    background-color: #506050;
+}
+
+.red {
+    background-color: #605050;
 }
 
 .search_box {
@@ -87,6 +97,31 @@ input {
     border-left: 1px solid #606060;
     border-right: 1px solid #606060;
     padding: 16px;
+}
+
+.settings {
+    background-color: #404040;
+    padding: 2px;
+    border-radius: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.setting {
+    text-align: center;
+    padding: 4px;
+    margin: 4px;
+    border-radius: 4px;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
 }
 
 /* TODO: The outline looked bad. What can we use
