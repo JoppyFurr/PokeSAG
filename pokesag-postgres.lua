@@ -56,7 +56,8 @@ end
 
 -- Use a prepared statement to store a page in the database
 function store_page (date, source, address, content)
-    local db = postgres.connectdb('postgresql://pokesag-sdr:pokesag-sdr@web.joppyfurr.lc:5432/pokesag')
+    local db = postgres.connectdb(
+        'postgresql://' .. username .. ':' .. password .. '@' .. path)
 
     local rc = db:prepare ('add-page',
         [[

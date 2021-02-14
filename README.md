@@ -29,5 +29,4 @@ The receiver has been tested with an RTL-SDRv3 on a Raspberry Pi 2. CPU utilisat
 ## Running
 * Launch the receiver with the `./run.sh` or `./run-postgres.sh` script. This will receive pages and store them in a database.
 
-* Launch the WebApp with NodeJS: `nodejs WebApp.js`. This will show the latest 100 pages on localhost:8080.
-  * Use `WebApp-postgres.js` if using Postgres instead of SQLite3
+* Launch the WebApp with NodeJS: `nodejs WebApp.js` or `nodejs WebApp-postgres.js`. This will show the latest 100 pages on localhost:8080.
