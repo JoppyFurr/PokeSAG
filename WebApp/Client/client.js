@@ -115,7 +115,7 @@ class PokeSAG_Client extends React.Component
                 </div>
 
                 <div className={this.state.settings_class}>
-                    <h3> Settings </h3>
+                    <h4> Settings </h4>
                     <input className={this.state.auto_refresh_class} type="button" value="Auto Refresh" onClick={this.toggle_auto_refresh}  />
                 </div>
 
