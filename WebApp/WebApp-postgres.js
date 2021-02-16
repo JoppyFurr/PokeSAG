@@ -57,7 +57,7 @@ app.get ('/Pages/', function onListenEvent (req, res) {
 app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
     if (req.params.type == 'ft') {
         let search_string = decodeURIComponent(req.params.string);
-        db.query ("SELECT * from pages WHERE tsx @@ websearch_to_tsquery('simple', $1) ORDER BY rx_date DESC LIMIT 100", [search_string], (query_err, query_res) => {
+        db.query ("select * from pages where tsx @@ websearch_to_tsquery('simple', $1) order by rx_date desc limit 100", [search_string], (query_err, query_res) => {
             if (query_err) {
                 throw query_err;
             }
@@ -66,7 +66,7 @@ app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
         });
     } else {
         let search_string = decodeURIComponent(req.params.string).replace (/[#%.?\/\\]/g, '');
-        db.query ("select * from pages where content ilike $1 order by rx_date desc",['%' + search_string + '%'], (query_err, query_res) => {
+        db.query ("select * from pages where content ilike $1 order by rx_date desc limit 100",['%' + search_string + '%'], (query_err, query_res) => {
             if (query_err) {
                 throw query_err;
             }

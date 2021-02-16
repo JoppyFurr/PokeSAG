@@ -39,7 +39,7 @@ app.get ('/Pages/', function onListenEvent (req, res) {
 /* API to retrieve all pages matching a string */
 app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
     let search_string = decodeURIComponent(req.params.string).replace (/[#%.?\/\\]/g, '');
-    let statement = db.prepare ("select * from pages where content like (?) order by rx_date desc");
+    let statement = db.prepare ("select * from pages where content like (?) order by rx_date desc limit 100");
     statement.all (['%' + search_string + '%'], (error, rows) => {
         if (error) {
             throw error;
