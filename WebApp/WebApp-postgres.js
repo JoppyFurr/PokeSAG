@@ -55,7 +55,7 @@ app.get ('/Pages/', function onListenEvent (req, res) {
 
 /* API to retrieve all pages matching a string */
 app.get ('/Pages/Search/:string/', function onListenEvent (req, res) {
-    db.query ("select * from pages where content like $1 order by rx_date desc", ['%' + req.params.string + '%'], (query_err, query_res) => {
+    db.query ("select * from pages where content ilike $1 order by rx_date desc", ['%' + req.params.string + '%'], (query_err, query_res) => {
         if (query_err) {
             throw query_err;
         }
