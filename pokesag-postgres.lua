@@ -35,7 +35,7 @@ function create_database ()
 
     print ('Attempting to create table...')
     local rc = db:exec [[
-        CREATE TABLE IF NOT EXISTS pages (
+        create table if not exists pages (
             rx_date     timestamp   not null,
             source      text        not null,
             recipient   text        not null,
@@ -52,9 +52,9 @@ function create_database ()
 
     print ('Attempting to create search index column...')
     local rc = db:exec [[
-        ALTER TABLE pages
-        ADD COLUMN IF NOT EXISTS tsx tsvector
-        GENERATED ALWAYS AS (to_tsvector('simple', content)) STORED;
+        alter table pages
+        add column if not exists tsx tsvector
+        generated always as (to_tsvector('simple', content)) stored;
     ]]
 
     if rc:status() == postgres.PGRES_COMMAND_OK then
@@ -67,7 +67,7 @@ function create_database ()
 
     print ('Attempting to create search index...')
     local rc = db:exec [[
-        CREATE INDEX IF NOT EXISTS search_idx ON pages USING GIN (tsx);
+        create index if not exists search_idx on pages using GIN (tsx);
     ]]
 
     if rc:status() == postgres.PGRES_COMMAND_OK then
