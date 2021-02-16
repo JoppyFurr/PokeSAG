@@ -9,11 +9,14 @@ class PokeSAG_Client extends React.Component
         this.state = {
             pages_database: [],
             search_string: "",
+            
             auto_refresh: false,
             auto_refresh_timer: null,
             hamburger_class: "hamburger_button",
             settings_class: "settings hidden",
-            auto_refresh_class: "setting red"
+            auto_refresh_class: "setting red",
+            search_type: "ft",
+            search_type_class: "setting green",
         };
 
         this.refresh_data = this.refresh_data.bind (this);
@@ -21,21 +24,21 @@ class PokeSAG_Client extends React.Component
         this.perform_search = this.perform_search.bind (this);
         this.toggle_settings = this.toggle_settings.bind (this);
         this.toggle_auto_refresh = this.toggle_auto_refresh.bind (this);
+        this.toggle_search_type = this.toggle_search_type.bind (this);
     }
 
 
     update_search_string (e)
     {
-        /* Remove characters that don't “just work” */
-        let filtered_string = e.target.value.replace (/[#%.?\/\\]/g, '');
-        this.setState ( { search_string: filtered_string } );
+
+        this.setState ( { search_string: e.target.value } );
     }
 
     perform_search (e)
     {
         if (e.key === 'Enter' && this.state.search_string != '')
         {
-            fetch ('/Pages/Search/' + this.state.search_string + '/')
+            fetch ('/Pages/Search/' + this.state.search_type + '/' + encodeURIComponent(this.state.search_string) + '/')
                 .then ( result => {
                     result.json()
                         .then ( json => {
@@ -73,6 +76,22 @@ class PokeSAG_Client extends React.Component
         {
             this.setState({settings_class: "settings hidden"});
             this.setState({hamburger_class: "hamburger_button"});
+        }
+    }
+
+    toggle_search_type ()
+    {
+        if (this.state.search_type == 'ft')
+        {
+            this.state.search_type = 'basic';
+            this.setState({search_type_class: "setting red"});
+            
+        }
+        else
+        {
+            this.state.search_type = 'ft';
+            this.setState({search_type_class: "setting green"});
+            
         }
     }
 
@@ -117,6 +136,7 @@ class PokeSAG_Client extends React.Component
                 <div className={this.state.settings_class}>
                     <h4> Settings </h4>
                     <input className={this.state.auto_refresh_class} type="button" value="Auto Refresh" onClick={this.toggle_auto_refresh}  />
+                    <input className={this.state.search_type_class} type="button" value="Full Text Search" onClick={this.toggle_search_type}  />
                 </div>
 
                 <div className="page_table">

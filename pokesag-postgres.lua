@@ -32,8 +32,10 @@ function create_database ()
         return false
     end
 
+
+    print ('Attempting to create table...')
     local rc = db:exec [[
-        create table pages (
+        create table if not exists pages (
             rx_date     timestamp   not null,
             source      text        not null,
             recipient   text        not null,
@@ -41,11 +43,37 @@ function create_database ()
     ]]
 
     if rc:status() == postgres.PGRES_COMMAND_OK then
-        print ('Table created.')
-    elseif string.match(rc:errorMessage (), 'already exists') then
-        print ('Table detected.')
+        print ('...table okay.')
     else
         print ('Error creating table.')
+        print (rc:errorMessage ())
+        return false
+    end
+
+    print ('Attempting to create search index column...')
+    local rc = db:exec [[
+        alter table pages
+        add column if not exists tsx tsvector
+        generated always as (to_tsvector('simple', content)) stored;
+    ]]
+
+    if rc:status() == postgres.PGRES_COMMAND_OK then
+        print ('...search index column okay.')
+    else
+        print ('Error creating search index column.')
+        print (rc:errorMessage ())
+        return false
+    end
+
+    print ('Attempting to create search index...')
+    local rc = db:exec [[
+        create index if not exists search_idx on pages using GIN (tsx);
+    ]]
+
+    if rc:status() == postgres.PGRES_COMMAND_OK then
+        print ('...search index okay.')
+    else
+        print ('Error creating search index.')
         print (rc:errorMessage ())
         return false
     end
