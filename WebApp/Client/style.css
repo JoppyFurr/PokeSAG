@@ -1,3 +1,4 @@
+/* Layout */
 body {
     color: white;
     background-color: #282020;
@@ -5,22 +6,17 @@ body {
     overflow: scroll;
 }
 
-table {
+input {
+    color: #c0c0c0;
     background-color: #404040;
-    border-collapse: separate;
-    border-radius: 8px;
+    border: none;
+    padding: 16px;
+}
+
+.app_container, header {
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 32px;
-    width: 100%;
-}
-
-tbody tr:nth-child(odd) {
-    background-color: #505050;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #585858;
+    width: 85%;
 }
 
 header {
@@ -32,10 +28,21 @@ header h1 {
     margin: 0.67em 0;
 }
 
-.app_container, header {
-    margin-left: auto;
-    margin-right: auto;
-    width: 85%;
+/* Page Table */
+.page_table table {
+    background-color: #404040;
+    border-collapse: separate;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.page_table tbody tr:nth-child(odd) {
+    background-color: #505050;
+}
+
+.page_table tbody tr:nth-child(even) {
+    background-color: #585858;
 }
 
 .page_content {
@@ -43,61 +50,38 @@ header h1 {
     padding-left: 8px;
 }
 
+/* Toolbar */
 .toolbar {
     background-color: #404040;
     margin-top: 8px;
     margin-bottom: 8px;
     border-radius: 8px;
+    overflow: hidden;
     width: 100%;
     text-align: left;
 }
 
-.hamburger_button {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+.toolbar input {
+    border-right: 2px solid #606060;
     padding-left: 24px;
     padding-right: 24px;
-    border-left: none;
 }
 
-.green {
-    background-color: #506050;
-}
-
-.red {
-    background-color: #605050;
-}
-
-.search_box {
-    border-right: 2px solid #606060;
-}
-
-.refresh_button {
-    float: right;
-    padding-left: 24px;
-    margin-right: 8px;
+.toolbar .refresh_button {
     border-left: 2px solid #606060;
     border-right: none;
+    float: right;
 }
 
-.refresh_button:hover {
+.toolbar input[type=button]:hover {
     color: #ffc080;
 }
 
-.refresh_button:active {
+.toolbar input[type=button]:active {
     color: #e0a060;
 }
 
-input {
-    color: #c0c0c0;
-    background-color: #404040;
-    border-top: none;
-    border-bottom: none;
-    border-left: 1px solid #606060;
-    border-right: 1px solid #606060;
-    padding: 16px;
-}
-
+/* Settings */
 .settings {
     background-color: #404040;
     padding: 2px;
@@ -113,6 +97,15 @@ input {
     padding: 4px;
     margin: 4px;
     border-radius: 4px;
+}
+
+/* Utility/Tweaks */
+.green {
+    background-color: #506050;
+}
+
+.red {
+    background-color: #605050;
 }
 
 .hidden {
