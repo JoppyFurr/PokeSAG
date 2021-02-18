@@ -7,6 +7,7 @@ class PokeSAG_Client extends React.Component
         super ();
 
         this.state = {
+            mode: "normal",
             pages_database: [],
             search_string: "",
             
@@ -21,7 +22,7 @@ class PokeSAG_Client extends React.Component
 
         this.refresh_data = this.refresh_data.bind (this);
         this.update_search_string = this.update_search_string.bind (this);
-        this.perform_search = this.perform_search.bind (this);
+        this.handle_search = this.handle_search.bind (this);
         this.toggle_settings = this.toggle_settings.bind (this);
         this.toggle_auto_refresh = this.toggle_auto_refresh.bind (this);
         this.toggle_search_type = this.toggle_search_type.bind (this);
@@ -30,33 +31,48 @@ class PokeSAG_Client extends React.Component
 
     update_search_string (e)
     {
-
         this.setState ( { search_string: e.target.value } );
+
+        if (e.target.value == '')
+        {
+            this.state.mode = 'normal';
+            this.refresh_data ();
+        }
     }
 
-    perform_search (e)
+    handle_search (e)
     {
         if (e.key === 'Enter' && this.state.search_string != '')
         {
-            fetch ('/Pages/Search/' + this.state.search_type + '/' + encodeURIComponent(this.state.search_string) + '/')
-                .then ( result => {
-                    result.json()
-                        .then ( json => {
-                            this.setState ( { pages_database: json } );
-                        });
-                });
+            this.state.mode = 'search';
+            this.refresh_data ();
         }
     }
 
     refresh_data (e)
     {
-        fetch ('/Pages/')
-            .then ( result => {
-                result.json()
-                    .then ( json => {
-                        this.setState ( { pages_database: json } );
+        switch (this.state.mode)
+        {
+            case 'search':
+                fetch ('/Pages/Search/' + this.state.search_type + '/' + encodeURIComponent(this.state.search_string) + '/')
+                    .then ( result => {
+                        result.json()
+                            .then ( json => {
+                                this.setState ( { pages_database: json } );
+                            });
                     });
-            });
+                break;
+
+            case 'normal':
+            default:
+                fetch ('/Pages/')
+                    .then ( result => {
+                        result.json()
+                            .then ( json => {
+                                this.setState ( { pages_database: json } );
+                            });
+                    });
+        }
     }
 
     componentDidMount ()
@@ -129,7 +145,7 @@ class PokeSAG_Client extends React.Component
 
                 <div className="toolbar">
                     <input className={this.state.hamburger_class} type="button" value="☰" onClick={this.toggle_settings} />
-                    <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string} onChange={this.update_search_string} onKeyPress={this.perform_search} />
+                    <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string} onChange={this.update_search_string} onKeyPress={this.handle_search} />
                     <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} />
                 </div>
 
