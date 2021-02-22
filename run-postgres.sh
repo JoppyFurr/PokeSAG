@@ -4,7 +4,11 @@
 eval $(luarocks path --bin)
 
 # Start PokéSAG
+
+export DB_HOST="localhost"
+export DB_NAME="pokesag"
 export DB_USER="username"
 export DB_PASS="password"
-export DB_PATH="server:port/path"
+export DB_PORT="5432"
+
 ./pokesag-postgres.lua
