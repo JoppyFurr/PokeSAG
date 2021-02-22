@@ -18,23 +18,15 @@ class PokeSAG_Client extends React.Component
             search_type: "ft",
             search_type_class: "setting green",
         };
-
-        this.refresh_data = this.refresh_data.bind (this);
-        this.update_search_string = this.update_search_string.bind (this);
-        this.perform_search = this.perform_search.bind (this);
-        this.toggle_settings = this.toggle_settings.bind (this);
-        this.toggle_auto_refresh = this.toggle_auto_refresh.bind (this);
-        this.toggle_search_type = this.toggle_search_type.bind (this);
     }
 
-
-    update_search_string (e)
+    update_search_string = () =>
     {
 
         this.setState ( { search_string: e.target.value } );
     }
 
-    perform_search (e)
+    perform_search = () =>
     {
         if (e.key === 'Enter' && this.state.search_string != '')
         {
@@ -48,7 +40,7 @@ class PokeSAG_Client extends React.Component
         }
     }
 
-    refresh_data (e)
+    refresh_data = () =>
     {
         fetch ('/Pages/')
             .then ( result => {
@@ -59,13 +51,8 @@ class PokeSAG_Client extends React.Component
             });
     }
 
-    componentDidMount ()
-    {
-        this.refresh_data (null);
-    }
-
     /* Toggle whether the settings are visible or not */
-    toggle_settings ()
+    toggle_settings = () =>
     {
         if (this.state.settings_class == "settings hidden")
         {
@@ -79,7 +66,7 @@ class PokeSAG_Client extends React.Component
         }
     }
 
-    toggle_search_type ()
+    toggle_search_type = () =>
     {
         if (this.state.search_type == 'ft')
         {
@@ -95,7 +82,7 @@ class PokeSAG_Client extends React.Component
         }
     }
 
-    toggle_auto_refresh ()
+    toggle_auto_refresh = () =>
     {
         if (this.state.auto_refresh == false)
         {
@@ -110,6 +97,11 @@ class PokeSAG_Client extends React.Component
             this.state.auto_refresh_timer = null;
             this.setState({auto_refresh_class: "setting red"});
         }
+    }
+
+    componentDidMount ()
+    {
+        this.refresh_data (null);
     }
 
     render ()
