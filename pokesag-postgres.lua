@@ -3,19 +3,11 @@
 ------------------
 --  Environment --
 ------------------
-func get_env_with_default(key, fallback) {
-    value, exists := os.LookupEnv(key)
-    if !exists {
-        value = fallback
-    }
-    return value
-}
-
 local DB_HOST = os.getenv('DB_HOST')
-local DB_NAME = get_env_with_default('DB_NAME', 'pokesag')
+local DB_NAME = os.getenv('DB_NAME')
 local DB_USER = os.getenv('DB_USER')
 local DB_PASS = os.getenv('DB_PASS')
-local DB_PORT = get_env_with_default('DB_PORT', '5432')
+local DB_PORT = os.getenv('DB_PORT')
 
 ----------------
 --  Database  --
