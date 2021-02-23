@@ -21,7 +21,7 @@ class PokeSAG_Client extends React.Component
         };
     }
 
-    update_search_string = () =>
+    update_search_string = (e) =>
     {
         this.setState ( { search_string: e.target.value } );
 
@@ -32,7 +32,7 @@ class PokeSAG_Client extends React.Component
         }
     }
 
-    handle_search = () =>
+    handle_search = (e) =>
     {
         if (e.key === 'Enter' && this.state.search_string != '')
         {
