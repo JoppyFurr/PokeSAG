@@ -176,7 +176,7 @@ class SettingButton extends React.Component {
     render() {
         return (
             <input className={this.state.is_active ? 'setting green' : 'setting red'}
-            type="button" value={this.props.value} onClick={this.handle_click}  />
+                   type="button" value={this.props.value} onClick={this.handle_click}  />
         )
     }
 }
