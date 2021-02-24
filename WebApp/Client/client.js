@@ -11,13 +11,12 @@ class PokeSAG_Client extends React.Component
             pages_database: [],
             search_string: "",
             
-            auto_refresh: false,
-            auto_refresh_timer: null,
             hamburger_class: "hamburger_button",
             settings_class: "settings hidden",
-            auto_refresh_class: "setting red",
-            search_type: "ft",
-            search_type_class: "setting green",
+
+            full_text_search: false,
+            auto_refresh: false,
+            auto_refresh_timer: null,
         };
     }
 
@@ -46,6 +45,7 @@ class PokeSAG_Client extends React.Component
         switch (this.state.mode)
         {
             case 'search':
+                let search_type = this.state.full_text_search ? 'ft' : 'basic';
                 fetch ('/Pages/Search/' + this.state.search_type + '/' + encodeURIComponent(this.state.search_string) + '/')
                     .then ( result => {
                         result.json()
@@ -82,36 +82,27 @@ class PokeSAG_Client extends React.Component
         }
     }
 
-    toggle_search_type = () =>
+    handle_search_toggle = (is_active) =>
     {
-        if (this.state.search_type == 'ft')
-        {
-            this.state.search_type = 'basic';
-            this.setState({search_type_class: "setting red"});
-            
-        }
-        else
-        {
-            this.state.search_type = 'ft';
-            this.setState({search_type_class: "setting green"});
-            
-        }
+        this.setState({full_text_search: is_active})
     }
 
-    toggle_auto_refresh = () =>
+    handle_refresh_toggle = (is_active) =>
     {
-        if (this.state.auto_refresh == false)
+        if (is_active)
         {
-            this.state.auto_refresh = true;
-            this.state.auto_refresh_timer = setInterval( () => this.refresh_data(null), 15000);
-            this.setState({auto_refresh_class: "setting green"});
-        }
-        else
+            this.setState({
+                auto_refresh_timer: setInterval(() => this.refresh_data(null), 10000),
+                auto_refresh: true
+            });
+        } 
+        else 
         {
-            this.state.auto_refresh = false;
             clearInterval(this.state.auto_refresh_timer);
-            this.state.auto_refresh_timer = null;
-            this.setState({auto_refresh_class: "setting red"});
+            this.setState({
+                auto_refresh_timer: null,
+                auto_refresh: false
+            });
         }
     }
 
@@ -143,8 +134,8 @@ class PokeSAG_Client extends React.Component
 
                 <div className={this.state.settings_class}>
                     <h4> Settings </h4>
-                    <input className={this.state.auto_refresh_class} type="button" value="Auto Refresh" onClick={this.toggle_auto_refresh}  />
-                    <input className={this.state.search_type_class} type="button" value="Full Text Search" onClick={this.toggle_search_type}  />
+                    <SettingButton value="Auto Refresh" default_state={false} action={this.handle_refresh_toggle} />
+                    <SettingButton value="Full Text Search" default_state={true} action={this.handle_search_toggle} />
                 </div>
 
                 <div className="page_table">
@@ -161,5 +152,31 @@ class PokeSAG_Client extends React.Component
                     </table>
                 </div>
             </div>
+    }
+}
+
+class SettingButton extends React.Component {
+    constructor(props) {
+        super(props);
+        let stored_state = localStorage.getItem(props.value);
+        this.state = {
+            is_active: stored_state ? JSON.parse(stored_state) : props.default_state
+        };
+        this.props.action(this.state.is_active);
+    }
+
+    handle_click = () => {
+        /* we use a callback here, since setState is asynchronous */
+        this.setState({is_active: !this.state.is_active}, () => {
+            this.props.action(this.state.is_active);   
+            localStorage.setItem(this.props.value, this.state.is_active);
+        });
+    }
+
+    render() {
+        return (
+            <input className={this.state.is_active ? 'setting green' : 'setting red'}
+            type="button" value={this.props.value} onClick={this.handle_click}  />
+        )
     }
 }
