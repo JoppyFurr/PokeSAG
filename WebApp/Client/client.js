@@ -46,7 +46,7 @@ class PokeSAG_Client extends React.Component
         {
             case 'search':
                 let search_type = this.state.full_text_search ? 'ft' : 'basic';
-                fetch ('/Pages/Search/' + this.state.search_type + '/' + encodeURIComponent(this.state.search_string) + '/')
+                fetch ('/Pages/Search/' + search_type + '/' + encodeURIComponent(this.state.search_string) + '/')
                     .then ( result => {
                         result.json()
                             .then ( json => {
