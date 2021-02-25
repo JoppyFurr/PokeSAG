@@ -131,6 +131,7 @@ class PokeSAG_Client extends React.Component
                     <input className={this.state.hamburger_class} type="button" value="☰" onClick={this.toggle_settings} />
                     <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string}
                            onChange={this.update_search_string} onKeyPress={this.handle_search} />
+                    <div className="spacer"></div>
                     <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} />
                 </div>
 

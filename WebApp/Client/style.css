@@ -19,6 +19,13 @@ input {
     width: 85%;
 }
 
+@media all and (max-width:768px) {
+    /* On medium devices, reduce the page margins */
+    .app_container, header {
+        width: 90%;
+    }
+}
+
 header {
     border-bottom: 2px solid #808080;
 }
@@ -48,29 +55,55 @@ header h1 {
 .page_content {
     text-align: left;
     padding-left: 8px;
+    overflow-wrap: anywhere;
+}
+
+@media all and (max-width: 575px) {
+    /* On small devices, collapse the table */
+    .page_table tr {    
+        display: table;  
+        width:100%;    
+    }               
+    .page_table td {    
+        display: table-row; 
+        text-align: left;
+    }           
 }
 
 /* Toolbar */
 .toolbar {
     background-color: #404040;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin: 8px 0;
     border-radius: 8px;
     overflow: hidden;
-    width: 100%;
-    text-align: left;
+    display: flex;
+}
+
+.toolbar > *:last-child {
+    border-right: 0;
+}
+
+.toolbar .spacer {
+    flex-grow: 1;
+    border-right: 2px solid #606060;
+}
+
+@media all and (max-width:768px) {
+    /* On medium devices, hide the spacer, and grow the search box instead */
+    .toolbar .spacer {
+        display: none;
+    }
+
+    .toolbar .search_box {
+        flex-grow: 1;
+        min-width: 0;
+    }
 }
 
 .toolbar input {
     border-right: 2px solid #606060;
     padding-left: 24px;
     padding-right: 24px;
-}
-
-.toolbar .refresh_button {
-    border-left: 2px solid #606060;
-    border-right: none;
-    float: right;
 }
 
 .toolbar input[type=button]:hover {
