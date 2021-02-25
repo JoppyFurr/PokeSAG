@@ -19,7 +19,7 @@ input {
     width: 85%;
 }
 
-@media all and (max-width:768px) {
+@media all and (max-width: 768px) {
     /* On medium devices, reduce the page margins */
     .app_container, header {
         width: 90%;
@@ -88,7 +88,7 @@ header h1 {
     border-right: 2px solid #606060;
 }
 
-@media all and (max-width:768px) {
+@media all and (max-width: 768px) {
     /* On medium devices, hide the spacer, and grow the search box instead */
     .toolbar .spacer {
         display: none;
