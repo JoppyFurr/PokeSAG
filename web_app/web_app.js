@@ -1,14 +1,16 @@
 /*
  * Joppy Furr, 2018
  */
+const path = require ('path');
 const express = require ('express');
+const compression = require ('compression');
 const sqlite3 = require ('sqlite3').verbose ();
 
 /***********************
  * Database Connection *
  ***********************/
-
-let db = new sqlite3.Database('../pages.sqlite3', sqlite3.OPEN_READONLY, (error) => {
+const db_path = path.resolve (__dirname, '../pages.sqlite3');
+let db = new sqlite3.Database(db_path, sqlite3.OPEN_READONLY, (error) => {
     if (error) {
         return console.error (error.message);
     }
@@ -23,7 +25,10 @@ let db = new sqlite3.Database('../pages.sqlite3', sqlite3.OPEN_READONLY, (error)
 let app = express ();
 let port = process.env.PORT || 8080;
 
-app.use (express.static ('Client', { 'index': ['main.html'] } ));
+app.use (compression ())
+
+app.use (express.static (path.resolve (__dirname, './client/static'), { 'index': ['index.html'] } ));
+app.use (express.static (path.resolve (__dirname, './client/dist')));
 
 /* API to retrieve the 100 most recent pages */
 app.get ('/Pages/', function onListenEvent (req, res) {

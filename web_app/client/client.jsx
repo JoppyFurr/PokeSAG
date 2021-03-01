@@ -1,7 +1,7 @@
-/* PokéSAG browser implementation */
-class PokeSAG_Client extends React.Component
-{
+import React from 'react';
 
+export default class Client extends React.Component
+{
     constructor ()
     {
         super ();
@@ -150,10 +150,13 @@ class PokeSAG_Client extends React.Component
                 <div className="page_table">
                     <table>
                         <thead>
-                            <th scope="col">Received</th>
-                            <th scope="col">Source</th>
-                            <th scope="col">Recipient</th>
-                            <th scope="col">Message</th>
+                            <tr>
+                                <th scope="col">Received</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Recipient</th>
+                                <th scope="col">Message</th>
+                            </tr>
+
                         </thead>
                         <tbody>
                             {pages}

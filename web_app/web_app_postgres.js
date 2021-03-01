@@ -1,7 +1,9 @@
 /*
  * Joppy Furr, 2018
  */
+const path = require ('path');
 const express = require ('express');
+const compression = require ('compression');
 const postgres = require ('pg').Client;
 
 const DB_HOST = process.env.DB_HOST;
@@ -46,7 +48,10 @@ db.connect ();
 let app = express ();
 let port = process.env.PORT || 8003;
 
-app.use (express.static ('Client', { 'index': ['main.html'] } ));
+app.use (compression ())
+
+app.use (express.static (path.resolve (__dirname, './client/static'), { 'index': ['index.html'] } ));
+app.use (express.static (path.resolve (__dirname, './client/dist')));
 
 /* API to retrieve the 100 most recent pages */
 app.get ('/Pages/', function onListenEvent (req, res) {

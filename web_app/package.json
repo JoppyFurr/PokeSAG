@@ -1,0 +1,35 @@
+{
+  "name": "pokesag_webapp",
+  "version": "1.0.0",
+  "description": "WebApp component of PokéSAG",
+  "author": "Joppy Furr",
+  "license": "MIT",
+  "main": "web_app.js",
+  "browserslist": [
+    "defaults",
+    "not IE 11"
+  ],
+  "scripts": {
+    "build-dev": "npx webpack --mode=development --config client/webpack.config.js",
+    "build": "npx webpack --mode=production --config client/webpack.config.js",
+    "start": "node web_app.js",
+    "start-postgres": "node web_app_postgres.js"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.1",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/preset-env": "^7.13.5",
+    "@babel/preset-react": "^7.12.13",
+    "babel-loader": "^8.2.2",
+    "compression": "^1.7.4",
+    "core-js": "^3.9.1",
+    "express": "^4.17.1",
+    "pg": "^8.5.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "sqlite3": "^5.0.2",
+    "webpack": "^5.24.2",
+    "webpack-cli": "^4.5.0"
+  }
+}
