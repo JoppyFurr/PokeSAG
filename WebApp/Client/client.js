@@ -107,10 +107,9 @@ class PokeSAG_Client extends React.Component
     }
 
     handle_recipient_click = (r) => {
-        this.state.mode = "search";
-        this.state.search_string = r;
-        this.setState (this.state);
-        this.refresh_data ();
+        this.setState({mode: "search", search_string: r}, () => {
+            this.refresh_data();
+        });
     }
 
     componentDidMount ()
