@@ -52,6 +52,11 @@ header h1 {
     background-color: #585858;
 }
 
+.page_recipient:hover {
+    cursor: pointer;
+    color: #ffc080;
+}
+
 .page_content {
     text-align: left;
     padding-left: 8px;
