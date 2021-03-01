@@ -1,0 +1,33 @@
+{
+    "background_color": "#141414",
+    "description": "A web interface for viewing SDR-captured POCSAG pages.",
+    "display": "standalone",
+    "icons": [
+    {
+        "src": "images/icon_x128.png",
+        "sizes": "128x128",
+        "type": "image/png",
+        "purpose": "any"
+    },
+    {
+        "src": "images/icon_x256.png",
+        "sizes": "256x256",
+        "type": "image/png",
+        "purpose": "any"
+    },
+    {
+        "src": "images/maskable_icon_x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable" 
+    },
+    {
+        "src": "images/maskable_icon_x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable" 
+    }
+    ],
+    "name": "PokèSAG",
+    "start_url": "/"
+}
