@@ -56,7 +56,7 @@ function create_database ()
     local rc = db:exec [[
         alter table pages
         add column if not exists tsx tsvector
-        generated always as (to_tsvector('simple', content)) stored;
+        generated always as (to_tsvector('simple', recipient || ' ' || content)) stored;
     ]]
 
     if rc:status() == postgres.PGRES_COMMAND_OK then
