@@ -72,7 +72,7 @@ app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
         });
     } else {
         let search_string = decodeURIComponent(req.params.string).replace (/[#%.?\/\\]/g, '');
-        db.query ("select * from pages where content ilike $1 order by rx_date desc limit 100",['%' + search_string + '%'], (query_err, query_res) => {
+        db.query ("select * from pages where content ilike $1 or recipient=$2 order by rx_date desc limit 100", ['%' + search_string + '%', search_string], (query_err, query_res) => {
             if (query_err) {
                 throw query_err;
             }
