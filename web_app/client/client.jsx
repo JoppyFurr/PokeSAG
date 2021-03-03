@@ -134,11 +134,12 @@ export default class Client extends React.Component
             <div className="app_container">
 
                 <div className="toolbar">
-                    <input className={this.state.hamburger_class} type="button" value="☰" onClick={this.toggle_settings} />
+                    <input className={this.state.hamburger_class} type="button" value="☰" onClick={this.toggle_settings} 
+                           title="Settings" />
                     <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string}
-                           onChange={this.update_search_string} onKeyPress={this.handle_search} />
+                           onChange={this.update_search_string} onKeyPress={this.handle_search} aria-label="Search Box" />
                     <div className="spacer"></div>
-                    <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} />
+                    <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} title="Refresh" />
                 </div>
 
                 <div className={this.state.settings_class}>
