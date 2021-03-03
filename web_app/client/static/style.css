@@ -13,7 +13,7 @@ input {
     padding: 16px;
 }
 
-.app_container, header {
+header, main {
     margin-left: auto;
     margin-right: auto;
     width: 85%;
@@ -21,7 +21,7 @@ input {
 
 @media all and (max-width: 768px) {
     /* On medium devices, reduce the page margins */
-    .app_container, header {
+    header, main {
         width: 90%;
     }
 }
@@ -36,7 +36,7 @@ header h1 {
 }
 
 /* Page Table */
-.page_table table {
+#page_table table {
     background-color: #404040;
     border-collapse: separate;
     border-radius: 8px;
@@ -44,11 +44,11 @@ header h1 {
     width: 100%;
 }
 
-.page_table tbody tr:nth-child(odd) {
+#page_table tbody tr:nth-child(odd) {
     background-color: #505050;
 }
 
-.page_table tbody tr:nth-child(even) {
+#page_table tbody tr:nth-child(even) {
     background-color: #585858;
 }
 
@@ -65,18 +65,18 @@ header h1 {
 
 @media all and (max-width: 575px) {
     /* On small devices, collapse the table */
-    .page_table tr {    
+    #page_table tr {    
         display: table;  
         width:100%;    
     }               
-    .page_table td {    
+    #page_table td {    
         display: table-row; 
         text-align: left;
     }           
 }
 
 /* Toolbar */
-.toolbar {
+#toolbar {
     background-color: #404040;
     margin: 8px 0;
     border-radius: 8px;
@@ -84,43 +84,43 @@ header h1 {
     display: flex;
 }
 
-.toolbar > *:last-child {
+#toolbar > *:last-child {
     border-right: 0;
 }
 
-.toolbar .spacer {
+#toolbar .spacer {
     flex-grow: 1;
     border-right: 2px solid #606060;
 }
 
 @media all and (max-width: 768px) {
     /* On medium devices, hide the spacer, and grow the search box instead */
-    .toolbar .spacer {
+    #toolbar .spacer {
         display: none;
     }
 
-    .toolbar .search_box {
+    #toolbar .search_box {
         flex-grow: 1;
         min-width: 0;
     }
 }
 
-.toolbar input {
+#toolbar input {
     border-right: 2px solid #606060;
     padding-left: 24px;
     padding-right: 24px;
 }
 
-.toolbar input[type=button]:hover {
+#toolbar input[type=button]:hover {
     color: #ffc080;
 }
 
-.toolbar input[type=button]:active {
+#toolbar input[type=button]:active {
     color: #e0a060;
 }
 
 /* Settings */
-.settings {
+#settings {
     background-color: #404040;
     padding: 2px;
     border-radius: 8px;
