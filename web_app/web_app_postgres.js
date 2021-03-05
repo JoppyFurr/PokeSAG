@@ -55,7 +55,8 @@ app.use (express.static (path.resolve (__dirname, './client/dist')));
 
 /* API to retrieve the 100 most recent pages */
 app.get ('/Pages/', function onListenEvent (req, res) {
-    db.query ('select * from pages order by rx_date desc limit 100', (query_err, query_res) => {
+    db.query (`select rx_date, source, recipient, content from pages
+               order by rx_date desc, recipient asc limit 150`, (query_err, query_res) => {
         if (query_err) {
             throw query_err;
         }
@@ -68,7 +69,8 @@ app.get ('/Pages/', function onListenEvent (req, res) {
 app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
     if (req.params.type == 'ft') {
         let search_string = decodeURIComponent(req.params.string);
-        db.query ("select * from pages where tsx @@ websearch_to_tsquery('simple', $1) order by rx_date desc limit 100", [search_string], (query_err, query_res) => {
+        db.query (`select rx_date, source, recipient, content from pages where tsx @@ websearch_to_tsquery('simple', $1)
+                   order by rx_date desc, recipient asc limit 150`, [search_string], (query_err, query_res) => {
             if (query_err) {
                 throw query_err;
             }
@@ -77,7 +79,8 @@ app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
         });
     } else {
         let search_string = decodeURIComponent(req.params.string).replace (/[#%.?\/\\]/g, '');
-        db.query ("select * from pages where content ilike $1 or recipient=$2 order by rx_date desc limit 100", ['%' + search_string + '%', search_string], (query_err, query_res) => {
+        db.query (`select rx_date, source, recipient, content from pages where content ilike $1 or recipient=$2
+                   order by rx_date desc, recipient asc limit 150`, ['%' + search_string + '%', search_string], (query_err, query_res) => {
             if (query_err) {
                 throw query_err;
             }
