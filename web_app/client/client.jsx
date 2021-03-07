@@ -1,4 +1,5 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 
 export default class Client extends React.Component
 {
@@ -13,6 +14,8 @@ export default class Client extends React.Component
             
             hamburger_class: "hamburger_button",
             settings_class: "hidden",
+
+            date_format: "D TT",
 
             full_text_search: false,
             auto_refresh: false,
@@ -106,6 +109,18 @@ export default class Client extends React.Component
         }
     }
 
+    handle_24h_toggle = (is_active) =>
+    {
+        if (is_active)
+        {
+            this.setState ({date_format: 'D TT'});
+        } 
+        else 
+        {
+            this.setState ({date_format: 'D tt'});
+        }
+    }
+
     handle_recipient_click = (r) => {
         this.setState({mode: "search", search_string: r}, () => {
             this.refresh_data();
@@ -121,8 +136,9 @@ export default class Client extends React.Component
     {
         /* Get the list of messages */
         let pages = this.state.pages_database.map ( page => {
+            const formatted_date = DateTime.fromISO(page.rx_date, {zone: 'local'}).toFormat(this.state.date_format);
             return <tr>
-                    <td className="page_rx_date">{page.rx_date}</td>
+                    <td className="page_rx_date">{formatted_date}</td>
                     <td className="page_source">{page.source}</td>
                     <td className="page_recipient" onClick={() => this.handle_recipient_click (page.recipient)}>{page.recipient}</td>
                     <td className="page_content">{page.content}</td>
@@ -145,6 +161,7 @@ export default class Client extends React.Component
                     <h4> Settings </h4>
                     <SettingButton value="Auto Refresh" default_state={false} action={this.handle_refresh_toggle} />
                     <SettingButton value="Full Text Search" default_state={true} action={this.handle_search_toggle} />
+                    <SettingButton value="24 Hour Time" default_state={true} action={this.handle_24h_toggle} />
                 </div>
 
                 <div id="page_table">
