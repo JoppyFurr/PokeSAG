@@ -4,7 +4,8 @@
 const path = require ('path');
 const express = require ('express');
 const compression = require ('compression');
-const postgres = require ('pg').Client;
+const pg = require('pg');
+const { DateTime } = require("luxon");
 
 const DB_HOST = process.env.DB_HOST;
 const DB_NAME = process.env.DB_NAME || 'pokesag';
@@ -12,25 +13,12 @@ const DB_USER = process.env.DB_USER;
 const DB_PASS = process.env.DB_PASS;
 const DB_PORT = process.env.DB_PORT || 5432;
 
-/*********************
- * Utility functions *
- *********************/
-
-function clean_rows (rows)
-{
-    for (i = 0; i < rows.length; i++)
-    {
-        /* Remove the T, and chop off the milliseconds. */
-        rows[i].rx_date = rows[i].rx_date.toISOString ().slice (0,19).replace ('T', ' ');
-    }
-}
-
 
 /***********************
  * Database Connection *
  ***********************/
 
-let db = new postgres (
+let db = new pg.Client (
     {
         user: DB_USER,
         password: DB_PASS,
@@ -39,6 +27,11 @@ let db = new postgres (
         port: DB_PORT,
     } );
 db.connect ();
+
+/* replace the default node-postgres date parser with one that doesn't (incorrectly) assume UTC */
+pg.types.setTypeParser(pg.types.builtins.TIMESTAMP, date => {
+    return DateTime.fromSQL(date).toISO();
+});
 
 
 /***************
@@ -60,7 +53,6 @@ app.get ('/Pages/', function onListenEvent (req, res) {
         if (query_err) {
             throw query_err;
         }
-        clean_rows (query_res.rows);
         res.send (query_res.rows);
     });
 });
@@ -74,7 +66,6 @@ app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
             if (query_err) {
                 throw query_err;
             }
-            clean_rows (query_res.rows);
             res.send (query_res.rows);
         });
     } else {
@@ -84,7 +75,6 @@ app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
             if (query_err) {
                 throw query_err;
             }
-            clean_rows (query_res.rows);
             res.send (query_res.rows);
         });
     }

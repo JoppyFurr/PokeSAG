@@ -5,6 +5,22 @@ const path = require ('path');
 const express = require ('express');
 const compression = require ('compression');
 const sqlite3 = require ('sqlite3').verbose ();
+const { DateTime } = require('luxon');
+
+
+/*********************
+ * Utility functions *
+ *********************/
+
+function fix_dates (rows)
+{
+    for (i = 0; i < rows.length; i++)
+    {
+        /* Convert legacy date format to ISO 8601 */
+        rows[i].rx_date = DateTime.fromSQL(rows[i].rx_date).toISO();
+    }
+}
+
 
 /***********************
  * Database Connection *
@@ -37,6 +53,7 @@ app.get ('/Pages/', function onListenEvent (req, res) {
         if (error) {
             throw error;
         }
+        fix_dates (rows);
         res.send (rows);
     });
 });
@@ -49,6 +66,7 @@ app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
         if (error) {
             throw error;
         }
+        fix_dates (rows);
         res.send (rows);
     });
 });
