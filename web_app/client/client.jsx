@@ -48,26 +48,27 @@ export default class Client extends React.Component
         switch (this.state.mode)
         {
             case 'search':
-                let search_type = this.state.full_text_search ? 'ft' : 'basic';
-                fetch ('/pages/search/' + search_type + '/' + encodeURIComponent (this.state.search_string) + '/')
-                    .then ( result => {
-                        result.json ()
-                            .then ( json => {
-                                this.setState ({ pages_database: json.data });
-                            });
-                    });
+                const type = this.state.full_text_search ? 'ft' : 'basic';
+                const query = encodeURIComponent (this.state.search_string);
+                var url = `/pages/search/${type}/${query}/`;
                 break;
 
             case 'normal':
             default:
-                fetch ('/pages/')
-                    .then ( result => {
-                        result.json ()
-                            .then ( json => {
-                                this.setState ({ pages_database: json.data });
-                            });
-                    });
+                var url = `/pages/`;
         }
+
+        fetch (url)
+            .then (result => result.json ())
+            .then (json => {
+                if (!json.success) {
+                    throw Error (json.error);
+                }
+                this.setState ({pages_database: json.data});
+            })
+            .catch (error => {
+                console.error ('Unable to fetch pages:', error);    
+            });
     }
 
     /* Toggle whether the settings are visible or not */
@@ -136,7 +137,7 @@ export default class Client extends React.Component
     {
         /* Get the list of messages */
         let pages = this.state.pages_database.map ( page => {
-            const formatted_date = DateTime.fromISO(page.rx_date, {zone: 'local'}).toFormat(this.state.date_format);
+            const formatted_date = DateTime.fromISO(page.rx_date).toFormat(this.state.date_format);
             return <tr>
                     <td className="page_rx_date">{formatted_date}</td>
                     <td className="page_source">{page.source}</td>
@@ -173,7 +174,6 @@ export default class Client extends React.Component
                                 <th scope="col">Recipient</th>
                                 <th scope="col">Message</th>
                             </tr>
-
                         </thead>
                         <tbody>
                             {pages}
