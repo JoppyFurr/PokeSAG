@@ -15,7 +15,7 @@ export default class Client extends React.Component
             hamburger_class: "hamburger_button",
             settings_class: "hidden",
 
-            date_format: "D TT",
+            date_format: "yyyy-LL-dd TT",
 
             full_text_search: false,
             auto_refresh: false,
@@ -113,11 +113,11 @@ export default class Client extends React.Component
     {
         if (is_active)
         {
-            this.setState ({date_format: 'D TT'});
+            this.setState ({date_format: 'yyyy-LL-dd TT'});
         } 
         else 
         {
-            this.setState ({date_format: 'D tt'});
+            this.setState ({date_format: 'yyyy-LL-dd tt'});
         }
     }
 
