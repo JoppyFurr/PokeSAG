@@ -49,22 +49,22 @@ export default class Client extends React.Component
         {
             case 'search':
                 let search_type = this.state.full_text_search ? 'ft' : 'basic';
-                fetch ('/Pages/Search/' + search_type + '/' + encodeURIComponent (this.state.search_string) + '/')
+                fetch ('/pages/search/' + search_type + '/' + encodeURIComponent (this.state.search_string) + '/')
                     .then ( result => {
                         result.json ()
                             .then ( json => {
-                                this.setState ({ pages_database: json });
+                                this.setState ({ pages_database: json.data });
                             });
                     });
                 break;
 
             case 'normal':
             default:
-                fetch ('/Pages/')
+                fetch ('/pages/')
                     .then ( result => {
                         result.json ()
                             .then ( json => {
-                                this.setState ({ pages_database: json });
+                                this.setState ({ pages_database: json.data });
                             });
                     });
         }

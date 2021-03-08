@@ -46,29 +46,38 @@ app.use (compression ())
 app.use (express.static (path.resolve (__dirname, './client/static'), { 'index': ['index.html'] } ));
 app.use (express.static (path.resolve (__dirname, './client/dist')));
 
-/* API to retrieve the 100 most recent pages */
-app.get ('/Pages/', function onListenEvent (req, res) {
-    let statement = db.prepare ('select * from pages order by rx_date desc, recipient asc limit 150');
-    statement.all ([], (error, rows) => {
-        if (error) {
-            throw error;
-        }
-        fix_dates (rows);
-        res.send (rows);
+/* A small wrapper around a app.get handler.
+   This abstracts away generic code that is used on all API requests. */
+function GET(url, handler) {
+    app.get(url, (req, res) => {
+        handler(req).all ((error, rows) => {
+            if (error) {
+                res.status(500).json({
+                    success: false,
+                    error: error.message || error
+                });
+            }
+            fix_dates (rows);
+            res.json({
+                success: true,
+                data: rows
+            });
+        });
     });
+}
+
+GET('/pages/', () => {
+    return db.prepare(`select * from pages 
+                       order by rx_date desc, recipient asc 
+                       limit 150`);
 });
 
-/* API to retrieve all pages matching a string */
-app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
-    let search_string = decodeURIComponent(req.params.string).replace (/[#%.?\/\\]/g, '');
-    let statement = db.prepare ("select * from pages where content like (?) order by rx_date desc, recipient asc limit 150");
-    statement.all (['%' + search_string + '%'], (error, rows) => {
-        if (error) {
-            throw error;
-        }
-        fix_dates (rows);
-        res.send (rows);
-    });
+GET('/pages/search/:type/:string/', req => {
+    query = req.params.string;
+    return db.prepare(`select * from pages 
+                       where content like (?) 
+                       order by rx_date desc, recipient asc 
+                       limit 150`, [`%${query}%`]);
 });
 
 let server = app.listen (port, '::', function () {
