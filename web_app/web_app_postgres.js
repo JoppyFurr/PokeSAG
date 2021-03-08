@@ -4,33 +4,26 @@
 const path = require ('path');
 const express = require ('express');
 const compression = require ('compression');
-const pg = require('pg');
-const { DateTime } = require("luxon");
-
-const DB_HOST = process.env.DB_HOST;
-const DB_NAME = process.env.DB_NAME || 'pokesag';
-const DB_USER = process.env.DB_USER;
-const DB_PASS = process.env.DB_PASS;
-const DB_PORT = process.env.DB_PORT || 5432;
+const { DateTime } = require('luxon');
 
 
 /***********************
  * Database Connection *
  ***********************/
 
-let db = new pg.Client (
-    {
-        user: DB_USER,
-        password: DB_PASS,
-        host: DB_HOST,
-        database: DB_NAME,
-        port: DB_PORT,
-    } );
-db.connect ();
+const pgp = require('pg-promise')();
 
-/* replace the default node-postgres date parser with one that doesn't (incorrectly) assume UTC */
-pg.types.setTypeParser(pg.types.builtins.TIMESTAMP, date => {
+// replace the default node-postgres date parser with one that doesn't (incorrectly) assume UTC
+pgp.pg.types.setTypeParser(pgp.pg.types.builtins.TIMESTAMP, date => {
     return DateTime.fromSQL(date).toISO();
+});
+
+const db = pgp ({
+    user: process.env.DB_USER,
+    password: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME || 'pokesag',
+    port: process.env.DB_PORT || 5432,
 });
 
 
@@ -46,39 +39,46 @@ app.use (compression ())
 app.use (express.static (path.resolve (__dirname, './client/static'), { 'index': ['index.html'] } ));
 app.use (express.static (path.resolve (__dirname, './client/dist')));
 
-/* API to retrieve the 100 most recent pages */
-app.get ('/Pages/', function onListenEvent (req, res) {
-    db.query (`select rx_date, source, recipient, content from pages
-               order by rx_date desc, recipient asc limit 150`, (query_err, query_res) => {
-        if (query_err) {
-            throw query_err;
+/* A small wrapper around a app.get handler.
+   This abstracts away generic code that is used on all API requests. */
+function GET(url, handler) {
+    app.get(url, async (req, res) => {
+        try {
+            // execute the database query
+            const data = await handler(req);
+            res.json({
+                success: true,
+                data: data
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: error.message || error
+            });
         }
-        res.send (query_res.rows);
     });
+}
+
+GET('/pages/', () => {
+    return db.any(`select rx_date, source, recipient, content from pages 
+                   order by rx_date desc, recipient asc 
+                   limit 150`);
 });
 
-/* API to retrieve all pages matching a string */
-app.get ('/Pages/Search/:type/:string/', function onListenEvent (req, res) {
-    if (req.params.type == 'ft') {
-        let search_string = decodeURIComponent(req.params.string);
-        db.query (`select rx_date, source, recipient, content from pages where tsx @@ websearch_to_tsquery('simple', $1)
-                   order by rx_date desc, recipient asc limit 150`, [search_string], (query_err, query_res) => {
-            if (query_err) {
-                throw query_err;
-            }
-            res.send (query_res.rows);
-        });
-    } else {
-        let search_string = decodeURIComponent(req.params.string).replace (/[#%.?\/\\]/g, '');
-        db.query (`select rx_date, source, recipient, content from pages where content ilike $1 or recipient=$2
-                   order by rx_date desc, recipient asc limit 150`, ['%' + search_string + '%', search_string], (query_err, query_res) => {
-            if (query_err) {
-                throw query_err;
-            }
-            res.send (query_res.rows);
-        });
-    }
+GET('/pages/search/ft/:string/', req => {
+    const query = req.params.string;
+    return db.any(`select rx_date, source, recipient, content from pages 
+                   where tsx @@ websearch_to_tsquery('simple', $1::text)
+                   order by rx_date desc, recipient asc 
+                   limit 150`, [query]);
+});
 
+GET('/pages/search/basic/:string/', req => {
+    const query = req.params.string;
+    return db.any(`select rx_date, source, recipient, content from pages 
+                   where content ilike $1::text OR recipient=$2::text
+                   order by rx_date desc, recipient asc 
+                   limit 150`, [`%${query}%`, query]);
 });
 
 let server = app.listen (port, '::', function () {
