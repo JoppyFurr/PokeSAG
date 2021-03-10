@@ -26,6 +26,26 @@ const db = pgp ({
     port: process.env.DB_PORT || 5432,
 });
 
+function latest(offset=0) {
+    return db.any (`SELECT rx_date, source, recipient, content FROM pages 
+                    ORDER BY rx_date DESC, recipient ASC 
+                    LIMIT 100 OFFSET $1::int`, [offset]);
+}
+
+function search(query, offset=0) {
+    return db.any (`SELECT rx_date, source, recipient, content FROM pages 
+                    WHERE tsx @@ websearch_to_tsquery('simple', $2::text)
+                    ORDER BY rx_date DESC, recipient ASC 
+                    LIMIT 100 OFFSET $1::int`, [offset, query]);
+}
+
+function search_basic(query, offset=0) {
+    return db.any (`SELECT rx_date, source, recipient, content FROM pages 
+                    WHERE content ILIKE $2::text OR recipient=$3::text
+                    ORDER BY rx_date DESC, recipient ASC 
+                    LIMIT 100 OFFSET $1::int`, [offset, `%${query}%`, query]);
+}
+
 
 /***************
  * HTTP Server *
@@ -59,27 +79,18 @@ function GET(url, handler) {
     });
 }
 
-GET('/pages/', () => {
-    return db.any(`select rx_date, source, recipient, content from pages 
-                   order by rx_date desc, recipient asc 
-                   limit 150`);
-});
+function offset(req) {
+    return Math.max (0, (parseInt (req.params.page) - 1) * 100) || 0;
+}
 
-GET('/pages/search/ft/:string/', req => {
-    const query = req.params.string;
-    return db.any(`select rx_date, source, recipient, content from pages 
-                   where tsx @@ websearch_to_tsquery('simple', $1::text)
-                   order by rx_date desc, recipient asc 
-                   limit 150`, [query]);
-});
+GET('/pages/', () => latest ());
+GET('/pages/:page/', req => latest (offset(req)));
 
-GET('/pages/search/basic/:string/', req => {
-    const query = req.params.string;
-    return db.any(`select rx_date, source, recipient, content from pages 
-                   where content ilike $1::text OR recipient=$2::text
-                   order by rx_date desc, recipient asc 
-                   limit 150`, [`%${query}%`, query]);
-});
+GET('/pages/search/ft/:q/', req => search (req.params.q));
+GET('/pages/search/ft/:q/:page/', req => search (req.params.q, offset(req)));
+
+GET('/pages/search/basic/:q/', req => search_basic (req.params.q));
+GET('/pages/search/basic/:q/:page/', req => search_basic (req.params.q, offset(req)));
 
 let server = app.listen (port, '::', function () {
     console.log ('Listening on port %s.', server.address ().port);
