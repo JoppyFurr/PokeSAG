@@ -6,7 +6,7 @@ body {
     overflow: scroll;
 }
 
-input {
+input, button {
     color: #c0c0c0;
     background-color: #404040;
     border: none;
@@ -91,7 +91,11 @@ header h1 {
     display: flex;
 }
 
-#toolbar > *:last-child {
+#transporter { 
+    display: flex;
+}
+
+#toolbar > *:last-child, #transporter > *:last-child {
     border-right: 0;
 }
 
@@ -112,17 +116,24 @@ header h1 {
     }
 }
 
-#toolbar input {
+@media all and (max-width: 575px) {
+    /* On small devices, hide the page number */
+    #page_num {
+        display: none;
+    }
+}
+
+#toolbar input, #toolbar button {
     border-right: 2px solid #606060;
     padding-left: 24px;
     padding-right: 24px;
 }
 
-#toolbar input[type=button]:hover {
+#toolbar input[type=button]:hover, #toolbar button:hover {
     color: #ffc080;
 }
 
-#toolbar input[type=button]:active {
+#toolbar input[type=button]:active, #toolbar button:active  {
     color: #e0a060;
 }
 

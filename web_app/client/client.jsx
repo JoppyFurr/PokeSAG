@@ -11,6 +11,7 @@ export default class Client extends React.Component
             mode: "normal",
             pages_database: [],
             search_string: "",
+            page: 1,
             
             hamburger_class: "hamburger_button",
             settings_class: "hidden",
@@ -30,7 +31,7 @@ export default class Client extends React.Component
         if (e.target.value == '')
         {
             this.state.mode = 'normal';
-            this.refresh_data ();
+            this.refresh_clean ();
         }
     }
 
@@ -39,23 +40,24 @@ export default class Client extends React.Component
         if (e.key === 'Enter' && this.state.search_string != '')
         {
             this.state.mode = 'search';
-            this.refresh_data ();
+            this.refresh_clean ();
         }
     }
 
-    refresh_data = () =>
+    refresh = () =>
     {
+        const page = this.state.page;
         switch (this.state.mode)
         {
             case 'search':
                 const type = this.state.full_text_search ? 'ft' : 'basic';
                 const query = encodeURIComponent (this.state.search_string);
-                var url = `/pages/search/${type}/${query}/`;
+                var url = `/pages/search/${type}/${query}/${page}/`;
                 break;
 
             case 'normal':
             default:
-                var url = `/pages/`;
+                var url = `/pages/${page}/`;
         }
 
         fetch (url)
@@ -69,6 +71,13 @@ export default class Client extends React.Component
             .catch (error => {
                 console.error ('Unable to fetch pages:', error);    
             });
+    }
+
+    refresh_clean = () =>
+    {
+        this.setState ({page: 1}, () => {
+            this.refresh ();
+        });
     }
 
     /* Toggle whether the settings are visible or not */
@@ -124,13 +133,20 @@ export default class Client extends React.Component
 
     handle_recipient_click = (r) => {
         this.setState({mode: "search", search_string: r}, () => {
-            this.refresh_data();
+            this.refresh_clean ();
+        });
+    }
+    
+    handle_page_change = (page) =>
+    {
+        this.setState ({page: page}, () => {
+            this.refresh ();
         });
     }
 
     componentDidMount ()
     {
-        this.refresh_data (null);
+        this.refresh ();
     }
 
     render ()
@@ -150,12 +166,13 @@ export default class Client extends React.Component
         return (
             <main>
                 <nav id="toolbar">
-                    <input className={this.state.hamburger_class} type="button" value="☰" onClick={this.toggle_settings} 
-                           title="Settings" />
+                    <button className={this.state.hamburger_class} onClick={this.toggle_settings} title="Settings">
+                        <i className="bi-list"></i>
+                    </button>
                     <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string}
                            onChange={this.update_search_string} onKeyPress={this.handle_search} aria-label="Search Box" />
                     <div className="spacer"></div>
-                    <input className="refresh_button" type="button" value="↻" onClick={this.refresh_data} title="Refresh" />
+                    <Transporter on_change={this.handle_page_change} page={this.state.page}/>
                 </nav>
 
                 <div id="settings" className={this.state.settings_class}>
@@ -207,6 +224,53 @@ class SettingButton extends React.Component {
         return (
             <input className={this.state.is_active ? 'setting green' : 'setting red'}
                    type="button" value={this.props.value} onClick={this.handle_click}  />
+        )
+    }
+}
+
+class Transporter extends React.Component {
+    constructor (props) {
+        super (props);
+    }
+
+    clear = () => {
+        const page = 1;
+        this.props.on_change (page);
+    }
+
+    previous = () => {
+        const page = (this.props.page - 1) > 0 ? (this.props.page - 1) : 1;
+        this.props.on_change (page);
+    }
+
+    next = () => {
+        const page = this.props.page + 1;
+        this.props.on_change (page);
+    }
+
+    render () {
+        return (
+            <nav id="transporter">
+                {this.props.page > 1 &&
+                    <button onClick={this.previous} title="Previous Page">
+                        <i className="bi-chevron-left"></i>
+                    </button>
+                }
+                {this.props.page > 1 &&
+                    <button id="page_num" onClick={this.clear}>
+                        {this.props.page}
+                    </button>
+                }
+                <button onClick={this.next} title="Next Page">
+                    <i className="bi-chevron-right"></i>
+                </button>
+                <button onClick={this.clear} title="Refresh">
+                {this.props.page > 1
+                    ? <i className="bi-arrow-90deg-up"></i>
+                    : <i className="bi-arrow-clockwise"></i>
+                }
+                </button>
+            </nav>
         )
     }
 }
