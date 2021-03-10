@@ -33,6 +33,18 @@ let db = new sqlite3.Database(db_path, sqlite3.OPEN_READONLY, (error) => {
     console.log ('PokéSAG WebApp connected to database file pages.sqlite3');
 });
 
+function latest(offset=0) {
+    return db.prepare (`SELECT * FROM pages 
+                        ORDER BY rx_date DESC, recipient ASC 
+                        LIMIT 100 OFFSET (?)`, [offset]);
+}
+
+function search(query, offset=0) {
+    return db.prepare (`SELECT * FROM pages 
+                        WHERE content LIKE (?) 
+                        ORDER BY rx_date DESC, recipient ASC 
+                        LIMIT 100 OFFSET (?)`, [`%${query}%`, offset]);
+}
 
 /***************
  * HTTP Server *
@@ -66,19 +78,15 @@ function GET(url, handler) {
     });
 }
 
-GET('/pages/', () => {
-    return db.prepare(`select * from pages 
-                       order by rx_date desc, recipient asc 
-                       limit 150`);
-});
+function offset(req) {
+    return Math.max (0, (parseInt (req.params.page) - 1) * 100) || 0;
+}
 
-GET('/pages/search/:type/:string/', req => {
-    query = req.params.string;
-    return db.prepare(`select * from pages 
-                       where content like (?) 
-                       order by rx_date desc, recipient asc 
-                       limit 150`, [`%${query}%`]);
-});
+GET('/pages/', () => latest ());
+GET('/pages/:page/', req => latest (offset(req)));
+
+GET('/pages/search/:t/:q/', req => search (req.params.q));
+GET('/pages/search/:t/:q/:page/', req => search (req.params.q, offset(req)));
 
 let server = app.listen (port, '::', function () {
     console.log ('Listening on port %s.', server.address ().port);
