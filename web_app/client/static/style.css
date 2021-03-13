@@ -3,7 +3,7 @@ body {
     color: white;
     background-color: #282020;
     text-align: center;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 input, button {
