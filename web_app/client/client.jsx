@@ -13,8 +13,7 @@ export default class Client extends React.Component
             search_string: "",
             page: 1,
             
-            hamburger_class: "hamburger_button",
-            settings_class: "hidden",
+            settings_open: false,
 
             date_format: "yyyy-LL-dd TT",
 
@@ -79,19 +78,9 @@ export default class Client extends React.Component
         });
     }
 
-    /* Toggle whether the settings are visible or not */
-    toggle_settings = () =>
+    handle_settings_toggle = () =>
     {
-        if (this.state.settings_class == "hidden")
-        {
-            this.setState ({ settings_class: "visible" });
-            this.setState ({ hamburger_class: "hamburger_button green" });
-        }
-        else
-        {
-            this.setState ({ settings_class: "hidden" });
-            this.setState ({ hamburger_class: "hamburger_button" });
-        }
+        this.setState ({ settings_open: !this.state.settings_open });
     }
 
     handle_search_toggle = (is_active) =>
@@ -159,7 +148,7 @@ export default class Client extends React.Component
         return (
             <main>
                 <nav id="toolbar">
-                    <button className={this.state.hamburger_class} onClick={this.toggle_settings} title="Settings">
+                    <button className={this.state.settings_open ? 'green' : ''} onClick={this.handle_settings_toggle} title="Settings">
                         <i className="bi-list"></i>
                     </button>
                     <input className="search_box" type="text" placeholder="Search…" value={this.state.search_string}
@@ -168,7 +157,7 @@ export default class Client extends React.Component
                     <Transporter on_change={this.handle_page_change} page={this.state.page}/>
                 </nav>
 
-                <div id="settings" className={this.state.settings_class}>
+                <div id="settings" className={this.state.settings_open ? 'visible' : 'hidden'}>
                     <h4> Settings </h4>
                     <SettingButton value="Auto Refresh" default_state={false} action={this.handle_refresh_toggle} />
                     <SettingButton value="Full Text Search" default_state={true} action={this.handle_search_toggle} />
