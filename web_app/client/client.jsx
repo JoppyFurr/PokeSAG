@@ -19,8 +19,7 @@ export default class Client extends React.Component
             date_format: "yyyy-LL-dd TT",
 
             full_text_search: false,
-            auto_refresh: false,
-            auto_refresh_timer: null,
+            refresh_timer: null,
         };
     }
 
@@ -104,18 +103,12 @@ export default class Client extends React.Component
     {
         if (is_active)
         {
-            this.setState ({
-                auto_refresh_timer: setInterval (() => this.refresh_data (null), 10000),
-                auto_refresh: true
-            });
+            this.setState ({ refresh_timer: setInterval (() => this.refresh (null), 10000) });
         } 
         else 
         {
-            clearInterval (this.state.auto_refresh_timer);
-            this.setState ({
-                auto_refresh_timer: null,
-                auto_refresh: false
-            });
+            clearInterval (this.state.refresh_timer);
+            this.setState ({ refresh_timer: null });
         }
     }
 
