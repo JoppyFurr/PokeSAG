@@ -19,11 +19,11 @@ pgp.pg.types.setTypeParser(pgp.pg.types.builtins.TIMESTAMP, date => {
 });
 
 const db = pgp ({
-    user: process.env.DB_USER,
-    password: process.env.DB_USER,
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST || 'localhost',
     database: process.env.DB_NAME || 'pokesag',
     port: process.env.DB_PORT || 5432,
+    user: process.env.DB_USER || 'pokesag',
+    password: process.env.DB_PASS || 'pokesag',
 });
 
 function latest(offset=0) {
