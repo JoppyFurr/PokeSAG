@@ -1,7 +1,7 @@
 __Warning: Depending on your region, it may not be legal to share or act upon any messages received by a radio scanner. 
 You are advised to check your local regulations, and to NOT expose PokéSAG to the internet.__
 
-![PokéSAG Logo](web_app/client/static/images/icon_x128.png)
+![PokéSAG Logo](web/client/public/images/icon_x128.png)
 
 # PokéSAG
 An interface for receiving and viewing POCSAG pages.
@@ -12,8 +12,10 @@ The receiver has been tested with an RTL-SDRv3 on a Raspberry Pi 2. CPU utilisat
 PokéSAG is configured using environment variables. The following environment variables are always available.
 
 * `PORT`: The port for the web interface.
+* `DB_TYPE`: The database backend to use (`sqlite` or `postgres`). Defaults to `sqlite`.
+* `TOOLTIP_FILE`: Path to an optional tooltips JSON file.
 
-The following environment variables are only used for PostgreSQL.
+The following environment variables are only used for PostgreSQL (`DB_TYPE=postgres`).
 
 * `DB_HOST`: The host/IP address of your database server.
 * `DB_PORT`: The port of your database server.
@@ -62,8 +64,9 @@ Launch the receiver with the `./run.sh` or `./run-postgres.sh` script. This will
 
 ### Running the Web App
 
-* Change to the `web_app` directory.
+* Change to the `web` directory.
 * Install the required dependencies with `npm install`.
-* Build the javascript with `npm run build`.
-* Launch the web app with `npm run start` or `npm run start-postgres`.
+* Build the javascript with `npm run build-production`.
+* Launch the web app with `npm start`.
+* For PostgreSQL, set the `DB_TYPE` environment variable: `DB_TYPE=postgres npm start`.
 * The web interface will now be available at http://localhost:8080/

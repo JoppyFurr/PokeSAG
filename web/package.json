@@ -1,0 +1,27 @@
+{
+    "name": "pokesag_webapp",
+    "version": "1.0.0",
+    "description": "WebApp component of PokeSAG",
+    "author": "Joppy Furr",
+    "license": "MIT",
+    "main": "app.mjs",
+    "scripts": {
+        "build-development": "esbuild client/main.jsx --bundle --outfile=client/dist/main.js --sourcemap --jsx=automatic",
+        "build-production": "esbuild client/main.jsx --bundle --outfile=client/dist/main.js --sourcemap --minify --jsx=automatic",
+        "start": "node app.mjs"
+    },
+    "dependencies": {
+        "compression": "^1.8.1",
+        "express": "^5.2.1",
+        "luxon": "^3.7.2",
+        "pg": "^8.19.0",
+        "pg-promise": "^12.6.2",
+        "sqlite3": "^5.1.7"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.0",
+        "react": "^19.2.4",
+        "react-bootstrap-icons": "^1.11.6",
+        "react-dom": "^19.2.4"
+    }
+}
