@@ -44,6 +44,12 @@ function create_database ()
             content     text        not null);
     ]]
 
+    local rc = db:exec [[
+        alter table pages
+            add column if not exists id integer
+            generated always as identity primary key;
+    ]]
+
     if rc:status() == postgres.PGRES_COMMAND_OK then
         print ('...table okay.')
     else
